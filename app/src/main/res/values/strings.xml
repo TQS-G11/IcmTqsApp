@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">IcmTqsProject</string>
+    <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
+    <string name="password">password</string>
+    <string name="email_address">email address</string>
+    <string name="forgot_password">forgot password</string>
+    <string name="company_logo">company logo</string>
+    <string name="sign_in">Sign in</string>
+    <string name="title_activity_main_page">MainPage</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="register">Register</string>
+    <string name="cid_number">CID number</string>
+    <string name="API_URL">Insert-api-url-here</string>
+
+    <!-- Lotus -->
+    <string name="locus_rationale_title">Rationale Title</string>
+    <string name="locus_rationale_message">This is a rationale message.</string>
+    <string name="locus_permission_blocked_title">Permission Blocked Title</string>
+    <string name="locus_permission_blocked_message">This is a permission blocked message.</string>
+    <string name="locus_location_resolution_title">Permission Resolution Title</string>
+    <string name="locus_location_resolution_message">This is a permission resolution message.</string>
+
+    <!-- Notifs -->
+    <string name="channel_name">Qourier</string>
+    <string name="channel_description">Riders Work Assigned</string>
+    <string name="rider_ph">Rider Name</string>
+    <string name="distance_ph">22Km</string>
+    <string name="customer_ph">#3</string>
+    <string name="origin_ph">OriginPH</string>
+    <string name="delivery_ph">DeliveryPH</string>
+    <string name="state_ph">F</string>
+    <string name="origin_label">Origin:</string>
+    <string name="dest_label">Dest:</string>
+    <string name="customerid">CustomerId</string>
+    <string name="custid">CId:</string>
+    <string name="create_delivery">Create Delivery</string>
+    <string name="customerid_label">CustomerId</string>
+    <string name="enter_customer_id">Enter Customer ID</string>
+    <string name="delivery_addr">Delivery Addr</string>
+    <string name="enter_delivery_address">Enter delivery address</string>
+    <string name="origin_address">Origin Address</string>
+    <string name="enter_origin_address">Enter origin address</string>
+    <string name="latitude">Latitude</string>
+    <string name="enter_latitude">Enter latitude</string>
+    <string name="enter_longitude">Enter longitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="auto_location">Auto Location</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+</resources>
