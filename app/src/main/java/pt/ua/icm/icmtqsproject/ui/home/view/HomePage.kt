@@ -74,7 +74,10 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
             hasStartedDelivery = true
             startActivity(intent)
         }
-
+        var token =sharedPreferences.getString("token","error")
+        if (token==null){
+            token = "aaaaaaaaa"
+        }
         val binding : ActivityHomePageBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_home_page)
 
@@ -83,7 +86,8 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
         Locus.getCurrentLocation(this) { result ->
             result.location?.let {
                 // Recycler View
-                viewModel.getDeliveries().observe(this, Observer {
+
+                viewModel.getDeliveries(token).observe(this, Observer {
 
                     val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
                     val progressBar: ProgressBar = findViewById(R.id.progressBar)
@@ -130,7 +134,7 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
             override fun run() {
                 runOnUiThread {
                     // Retrieve data from UI
-                    viewModel.getDeliveries().observe(this@HomePage, Observer {
+                    viewModel.getDeliveries(token).observe(this@HomePage, Observer {
                         // Display data retrieved from API
                         it?.let { resource ->
                             when (resource.status) {

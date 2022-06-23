@@ -34,7 +34,6 @@ class RegisterPage : AppCompatActivity() {
         // Text Fields
         val nameField: EditText = findViewById(R.id.editName)
         val emailField: EditText = findViewById(R.id.editEmailAddress)
-        val cidField: EditText = findViewById(R.id.editCID)
         val passwordField: EditText = findViewById(R.id.editPassword)
 
         // Action buttons
@@ -42,25 +41,25 @@ class RegisterPage : AppCompatActivity() {
 
         // Buttons listeners
         registerButton.setOnClickListener {
-            register(nameField, emailField, passwordField, cidField, sharedPreferences)
+            register(nameField, emailField, passwordField, sharedPreferences)
         }
     }
 
-    private fun register(nameField: EditText, emailField: EditText, passwordField: EditText, cidField: EditText, prefs: SharedPreferences) {
-        val email: String = emailField.text.toString()
+    private fun register(nameField: EditText, emailField: EditText, passwordField: EditText,  prefs: SharedPreferences) {
+        val username: String = emailField.text.toString() // actually username
         val password: String = passwordField.text.toString()
         val name: String = nameField.text.toString()
 
         // Call register api endpoint
-        if (email.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty()){
+        if (username.isNotEmpty() && password.isNotEmpty() && name.isNotEmpty()){
             // Create Rider
 
-            val rider: Rider = Rider(email,password,name)
+            val rider: Rider = Rider(username,password,name,"RIDER")
             val json: String = Gson().toJson(rider)
 
             // Call Api to get register
             val client = OkHttpClient()
-
+            println("JSON: "+json)
             val mediaType = "application/json".toMediaTypeOrNull()
             val body = RequestBody.create(mediaType, json)
             val request = Request.Builder()
@@ -69,14 +68,15 @@ class RegisterPage : AppCompatActivity() {
                 .build()
 
             val response = client.newCall(request).execute()
-            // println("RESPONSE: " + response)
+            println("RESPONSE: "+response)
+            println("RESPONSE BODY: " + (response.body?.string() ?:"aaaa"))
             if(response.code == 201){
                 // Get auth token
                 val token = ""
 
                 // Set on preferences
                 val editor = prefs.edit()
-                editor.putString("riderId", email)
+                editor.putString("riderId", username)
                 editor.putString("authToken", token)
                 editor.apply()
 
@@ -84,7 +84,7 @@ class RegisterPage : AppCompatActivity() {
                 val intent = Intent(this, HomePage::class.java)
                 startActivity(intent)
             } else {
-                Toast.makeText(applicationContext, "Email already in use", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "Username already in use", Toast.LENGTH_LONG).show()
             }
         } else {
             Toast.makeText(applicationContext, "Fill all fields", Toast.LENGTH_LONG).show()
