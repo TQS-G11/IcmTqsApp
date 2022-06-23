@@ -15,10 +15,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import pt.ua.icm.icmtqsproject.R
 import pt.ua.icm.icmtqsproject.data.model.LoginRequest
 import pt.ua.icm.icmtqsproject.data.model.Rider
-import pt.ua.icm.icmtqsproject.ui.admin.view.AdminPage
 import pt.ua.icm.icmtqsproject.ui.home.view.HomePage
 
 class MainActivity : AppCompatActivity() {
@@ -34,17 +35,13 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         // Check if logged in already or not
-        val riderId: String? = sharedPreferences.getString("riderId", "")
+        val riderId: String? = sharedPreferences.getString("authToken", "")
         if (riderId != "") {
-            // Go to admin page if logged in as admin
-            if (riderId  == "admin@gmail.com") {
-                val intent = Intent(this, AdminPage::class.java)
-                startActivity(intent)
-            }else{
+
                 // Go to home page if logged in already
                 val intent = Intent(this, HomePage::class.java)
                 startActivity(intent)
-            }
+
         }
 
         // Text Fields
@@ -73,24 +70,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun signin(emailField: EditText, passwordField: EditText, prefs: SharedPreferences) {
-        val email: String = emailField.text.toString()
+        val username: String = emailField.text.toString()
         val password: String = passwordField.text.toString()
 
-        if (email == "admin@gmail.com") {
 
-            // Set on preferences
-            val editor = prefs.edit()
-            editor.putString("riderId", email)
-            editor.apply()
-
-            // Got to admin page
-            val intent = Intent(this, AdminPage::class.java)
-            startActivity(intent)
-        } else {
             // Call login api endpoint
-            if (email.isNotEmpty() && password.isNotEmpty()){
+            if (username.isNotEmpty() && password.isNotEmpty()){
                 // Create Rider
-                val loginRequest: LoginRequest = LoginRequest(email,password)
+                val loginRequest: LoginRequest = LoginRequest(username,password)
                 val json: String = Gson().toJson(loginRequest)
 
                 // Call Api to get register
@@ -104,14 +91,19 @@ class MainActivity : AppCompatActivity() {
                     .build()
 
                 val response = client.newCall(request).execute()
-                println("RESPONSE: " + response)
+                //println("RESPONSE: " + response)
+
                 if(response.code == 200){
                     // Get auth token
-                    val token = ""
 
                     // Set on preferences
+                    val jsonObj = JSONObject(response.body?.string() ?:"")
+                    val map = jsonObj.toMap()
+                    val map2 : Map<String,String> = map["token"] as Map<String, String>
+
+                    val token = map2["token"]
                     val editor = prefs.edit()
-                    editor.putString("riderId", email)
+                    editor.putString("riderId", username)
                     editor.putString("authToken", token)
                     editor.apply()
 
@@ -125,6 +117,19 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(applicationContext, "Fill all fields", Toast.LENGTH_LONG).show()
             }
+
+    }
+}
+fun JSONObject.toMap(): Map<String, *> = keys().asSequence().associateWith {
+    when (val value = this[it])
+    {
+        is JSONArray ->
+        {
+            val map = (0 until value.length()).associate { Pair(it.toString(), value[it]) }
+            JSONObject(map).toMap().values.toList()
         }
+        is JSONObject -> value.toMap()
+        JSONObject.NULL -> null
+        else            -> value
     }
 }

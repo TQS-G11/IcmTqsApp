@@ -74,7 +74,7 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
             hasStartedDelivery = true
             startActivity(intent)
         }
-        var token =sharedPreferences.getString("token","error")
+        var token =sharedPreferences.getString("authToken","error")
         if (token==null){
             token = "aaaaaaaaa"
         }
@@ -82,11 +82,12 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
             DataBindingUtil.setContentView(this, R.layout.activity_home_page)
 
         // Recycler view api call
+        println("GETTING DELIVERIES, TOKEN: "+token)
+
         setupViewModel()
         Locus.getCurrentLocation(this) { result ->
             result.location?.let {
                 // Recycler View
-
                 viewModel.getDeliveries(token).observe(this, Observer {
 
                     val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
@@ -102,7 +103,7 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
                         when (resource.status) {
                             Status.SUCCESS -> {
                                 println("SUCCESS")
-                                val toDeliver = resource.data?.filter { delivery -> delivery.deliveryState == "BID_CHECK" }
+                                val toDeliver = resource.data?.filter { delivery -> delivery.deliveryStatus == "BID_CHECK" }
                                 recyclerView.adapter = HomeAdapter(toDeliver as ArrayList<Delivery>, startPoint,this)
                                 recyclerView.layoutManager = LinearLayoutManager(this)
                                 recyclerView.visibility = View.VISIBLE
@@ -136,6 +137,7 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
                     // Retrieve data from UI
                     viewModel.getDeliveries(token).observe(this@HomePage, Observer {
                         // Display data retrieved from API
+                        println("AAAAAAAAADFGHIUYTREWWESRTYUIOPLKJHJHYT")
                         it?.let { resource ->
                             when (resource.status) {
                                 Status.SUCCESS -> {
@@ -153,15 +155,15 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
                                         // Set on preferences
                                         val editor = sharedPreferences.edit()
                                         editor.putString("isAssigned", "true")
-                                        val deliveryAssigned: Delivery? = resource.data.find { delivery -> delivery.riderId == sharedPreferences.getString("riderId", "") && delivery.deliveryState != "DELIVERED"  }
+                                        val deliveryAssigned: Delivery? = resource.data.find { delivery -> delivery.riderId == sharedPreferences.getString("riderId", "") && delivery.deliveryStatus != "DELIVERED"  }
                                         if (deliveryAssigned != null) {
-                                            editor.putString("deliveryId",deliveryAssigned.deliveryId.toString())
+                                            editor.putString("deliveryId",deliveryAssigned.id.toString())
                                         }
                                         if (deliveryAssigned != null) {
-                                            editor.putString("deliveryAddr",deliveryAssigned.deliveryAddr)
+                                            editor.putString("deliveryAddr",deliveryAssigned.destination)
                                         }
                                         if (deliveryAssigned != null) {
-                                            editor.putString("deliveryAddr",deliveryAssigned.originAddr)
+                                            editor.putString("deliveryAddr",deliveryAssigned.origin)
                                         }
                                         editor.apply()
 
@@ -218,14 +220,14 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
         val dest: TextView = dialog.findViewById(R.id.deliverAddress)
         val acceptButton : Button = dialog.findViewById(R.id.DeliveryBigButton)
 
-        origin.text = currentItem.originAddr
-        dest.text = currentItem.deliveryAddr
+        origin.text = currentItem.origin
+        dest.text = currentItem.destination
 
         // Get distance
         // Calculate distance
         val endPoint = Location("locationB")
-        endPoint.latitude = currentItem.latitude
-        endPoint.longitude = currentItem.longitude
+        endPoint.latitude = currentItem.storeLat
+        endPoint.longitude = currentItem.storeLon
 
         // Get distance and String
         val distance: Double = (startPoint.distanceTo(endPoint)/1000).toDouble()
@@ -233,7 +235,7 @@ class HomePage : AppCompatActivity(),HomeAdapter.HomeAdapterCallback {
         acceptButton.setOnClickListener{
 
             // Create Bid
-            val bid: Bid = Bid(riderId.toString(), currentItem.deliveryId, distance)
+            val bid: Bid = Bid(riderId.toString(), currentItem.id, distance)
             val json: String = Gson().toJson(bid)
 
             // Call Api to get register

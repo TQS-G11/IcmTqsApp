@@ -27,13 +27,13 @@ class HomeAdapter(private val deliveries: ArrayList<Delivery>, private val start
         @SuppressLint("ResourceAsColor")
         fun bind(delivery: Delivery, startPoint: Location) {
             itemView.apply {
-                textViewDeliveryAddr.text = delivery.deliveryAddr
-                textViewOriginAddr.text = delivery.originAddr
+                textViewDeliveryAddr.text = delivery.destination
+                textViewOriginAddr.text = delivery.origin
 
                 // Calculate distance
                 val endPoint = Location("locationB")
-                endPoint.latitude = delivery.latitude
-                endPoint.longitude = delivery.longitude
+                endPoint.latitude = delivery.storeLat
+                endPoint.longitude = delivery.storeLon
 
                 // Get distance and String
                 println(startPoint)

@@ -77,11 +77,10 @@ class RegisterPage : AppCompatActivity() {
                 // Set on preferences
                 val editor = prefs.edit()
                 editor.putString("riderId", username)
-                editor.putString("authToken", token)
                 editor.apply()
 
                 // Got to main page
-                val intent = Intent(this, HomePage::class.java)
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             } else {
                 Toast.makeText(applicationContext, "Username already in use", Toast.LENGTH_LONG).show()
